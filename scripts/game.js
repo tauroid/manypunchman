@@ -27,10 +27,23 @@ define(['app/assets','app/messagebus','app/movements'],
 
         window.onresize = this.onResize.bind(this);
 
+        window.ontouchstart = this.onTouchStart.bind(this);
+        window.ontouchend = this.onTouchEnd.bind(this);
         window.onclick = this.onClick.bind(this);
         window.onmousemove = this.onMouseMove.bind(this);
         window.onkeydown = this.onKeyDown.bind(this);
         window.onkeyup = this.onKeyUp.bind(this);
+
+        this.focussed = true;
+        window.onfocus = (function (ev) {
+            console.log("focus");
+            this.focussed = true;
+            this.lastUpdateTime = (new Date()).getTime();
+        }).bind(this);
+
+        window.onblur = (function (ev) {
+            this.focussed = false;
+        }).bind(this);
 
         this.assets = new Assets(this._start.bind(this));
     };
@@ -70,7 +83,12 @@ define(['app/assets','app/messagebus','app/movements'],
     };
 
     Game.prototype.update = function () {
-        var newtime = new Date().getTime();
+        if (!this.focussed) {
+            setTimeout(this.update.bind(this), this.updateTimestep);
+            return;
+        }
+
+        var newtime = (new Date()).getTime();
         var delta = newtime - this.lastUpdateTime;
         this.lastUpdateTime = newtime;
 
@@ -125,6 +143,14 @@ define(['app/assets','app/messagebus','app/movements'],
                 }
             }
         }
+    };
+
+    Game.prototype.onTouchStart = function (touchevent) {
+        this.messagebus.sendMessage("touchstart", touchevent);
+    };
+
+    Game.prototype.onTouchEnd = function (touchevent) {
+        this.messagebus.sendMessage("touchend", touchevent);
     };
 
     Game.prototype.onClick = function (mouseevent) {

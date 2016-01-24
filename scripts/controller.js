@@ -2,7 +2,10 @@
 
 define(function () {
     Controller = function () {
-        this.channels = ["click", "mousemove", "keydown", "keyup"];
+        this.channels = ["touchstart", "touchend", "click",
+                         "mousemove", "keydown", "keyup"];
+        this.transmitChannel = "action";
+        this.messagebus = new MessageBus();
     };
 
     Controller.prototype.attach = function (game) {
@@ -22,8 +25,25 @@ define(function () {
         }
     };
 
+    Controller.prototype.processTouchstart = function (touchevent) {
+        if (touchevent.touches.length > 0) {
+            this.messagebus.sendMessage("control", { 
+                action: "activate",
+                x: touchevent.touches.item(0).pageX,
+                y: touchevent.touches.item(0).pageY
+            });
+        };
+    };
+
+    Controller.prototype.processTouchend = function (touchevent) {
+    };
+
     Controller.prototype.processClick = function (mouseevent) {
-        console.log("click");
+        this.messagebus.sendMessage("control", {
+            action: "activate",
+            x: mouseevent.pageX,
+            y: mouseevent.pageY
+        });
     };
 
     Controller.prototype.processMousemove = function (message) {
@@ -32,7 +52,6 @@ define(function () {
 
     Controller.prototype.processKeydown = function (message) {
         console.log("keydown");
-        this.noise.play('buh');
     };
 
     Controller.prototype.processKeyup = function (message) {

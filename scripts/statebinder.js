@@ -8,7 +8,15 @@ define(function () {
     };
 
     StateBinder.prototype.bindState = function (state1, state2) {
-        this.bindings.push([state1, state2]);
+        var binding = [state1, state2];
+        this.bindings.push(binding);
+
+        return binding;
+    };
+
+    StateBinder.prototype.unbindState = function (binding) {
+        var i = this.bindings.indexOf(binding);
+        if (i != -1) this.bindings.splice(i,1);
     };
 
     StateBinder.prototype.syncAll1to2 = function () {

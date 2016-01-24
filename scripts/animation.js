@@ -3,7 +3,7 @@ define(["pixi.min"], function (PIXI) {
         this.frames = [];
         this.sprite = undefined;
 
-        this.frame_delayms = 50;
+        this.frame_delayms = 150;
         this.independent_frame_times = false;
         this.frame_times = [];
         this.frame_prefix_sum = [];
@@ -30,9 +30,19 @@ define(["pixi.min"], function (PIXI) {
         console.log("Sheet width: "+sf.width+", Sheet height: "+sf.height);
         var nx = Math.floor(sf.width / texwidth);
         var ny = Math.floor(sf.height / texheight);
+        console.log("nx: "+nx+" ny: "+ny);
 
-        for (var i = 0; i < nx; ++i) {
-            for (var j = 0; j < ny; ++j) {
+        var n1, n2;
+        if (rowMajor) {
+            n1 = ny;
+            n2 = nx;
+        } else {
+            n1 = nx;
+            n2 = ny;
+        }
+
+        for (var i = 0; i < n1; ++i) {
+            for (var j = 0; j < n2; ++j) {
                 var rect;
                 if (rowMajor) rect =
                     new PIXI.Rectangle(sf.x + j*texwidth, sf.y + i*texheight,
@@ -81,11 +91,13 @@ define(["pixi.min"], function (PIXI) {
         }
     };
 
-    Animation.prototype.play = function (game, repeat, groupname) {
-        if (repeat != undefined) this.repeat = repeat;
+    Animation.prototype.play = function (game, repeat, groupname, callback) {
+        if (repeat == undefined) repeat = true;
+        this.repeat = repeat;
         if (!groupname) groupname = Animation.groupname;
+        this.callback = callback;
 
-        this.start_time = (new Date).getTime();
+        this.start_time = (new Date()).getTime();
         if (!game.logicgroups.hasOwnProperty(groupname)) {
             game.logicgroups[groupname] = [];
         }
@@ -93,6 +105,7 @@ define(["pixi.min"], function (PIXI) {
         game.activateGroup(groupname);
 
         this.playing = true;
+        this.finished = false;
     };
 
     Animation.prototype.pause = function () {
@@ -109,22 +122,36 @@ define(["pixi.min"], function (PIXI) {
 
     Animation.prototype.stop = function () {
         this.finished = true;
+        if (this.callback) this.callback();
+        this.sprite.texture = this.frames[0];
     };
 
     Animation.prototype.update = function (delta, time) {
         if (!this.playing) return;
 
         var runtime = time - this.start_time;
-        this.sprite.texture = this.frames[this.getFrame(runtime)];
+        var frame = this.getFrame(runtime);
+        if (!this.repeat && frame == this.frames.length) this.stop();
+        else this.sprite.texture = this.frames[frame];
     };
 
     Animation.prototype.getFrame = function (runtime) {
         if (this.independent_frame_times) {
-            var cycletime = runtime % this.frame_prefix_sum[this.frames.length-1];
+            if (this.repeat) {
+                var cycletime = runtime % this.frame_prefix_sum[this.frames.length - 1];
+            } else {
+                if (runtime > this.frame_prefix_sum[this.frames.length - 1])
+                    return this.frames.length;
+                var cycletime = 
+                    Math.min(runtime, this.frame_prefix_sum[this.frames.length - 1]);
+            }
+
             for (var i = 0; cycletime > this.frame_prefix_sum[i]; ++i);
             return i;
         } else {
-            return Math.floor(runtime / this.frame_delayms) % this.frames.length;
+            var frame =  Math.floor(runtime / this.frame_delayms);
+            if (this.repeat) return frame % this.frames.length;
+            else return Math.min(frame, this.frames.length);
         }
     };
 

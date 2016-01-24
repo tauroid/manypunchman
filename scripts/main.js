@@ -1,7 +1,7 @@
 requirejs.config({
     baseUrl: "/scripts/common",
     paths: {
-        app: "/games/keyquest/scripts",
+        app: "/games/manypunchman/scripts",
     },
     shim: {
         "sylvester": {
@@ -22,6 +22,6 @@ function start(Game, Config) {
     game.ready(function () { game.load(config); });
 }
 
-require(['jquery','app/game','app/keyquest'], function ($, Game, Config) {
+require(['jquery','app/game','app/manypunchman'], function ($, Game, Config) {
     $(document).ready(function () { start(Game, Config); });
 });

@@ -27,10 +27,7 @@ define(["jquery", "pixi.min", "howler.min"], function ($, PIXI, H) {
                 asset.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
                 break;
             case "audio":
-                console.log(url);
-                asset = new H.Howl({ urls: [url], sprite: { buh: [1600, 2500] } });
-                asset.play('buh');
-                console.log(asset);
+                asset = new H.Howl({ urls: [url] });
                 break;
             default:
                 break;
