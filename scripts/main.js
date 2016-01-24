@@ -11,7 +11,7 @@ requirejs.config({
             exports: "THREE"
         }
     },
-    urlArgs: "bust=" + (new Date()).getTime(),
+    //urlArgs: "bust=" + (new Date()).getTime(),
     waitSeconds: 0
 });
 
