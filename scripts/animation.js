@@ -18,7 +18,7 @@ define(["pixi.min"], function (PIXI) {
     Animation.groupname = "animation";
 
     Animation.fromSpritesheet = function (texture, texwidth, texheight,
-                                          rowMajor, sheetframe, frame_times) {
+                                          rowMajor, framelimit, sheetframe, frame_times) {
         var anim = new Animation();
 
         if (!sheetframe) {
@@ -43,6 +43,8 @@ define(["pixi.min"], function (PIXI) {
 
         for (var i = 0; i < n1; ++i) {
             for (var j = 0; j < n2; ++j) {
+                if (framelimit && i * n2 + j >= framelimit) break;
+
                 var rect;
                 if (rowMajor) rect =
                     new PIXI.Rectangle(sf.x + j*texwidth, sf.y + i*texheight,

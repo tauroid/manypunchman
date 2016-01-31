@@ -19,12 +19,34 @@ define(["matter.min", "app/animation"], function (Matter, Animation) {
         this.punchright = Animation.fromSpritesheet(images.wpnman_punchright, 9, 13, true);
         this.idlesprite = new PIXI.Sprite(images.wpnman_idle);
 
+        this.nakedwalkleft = Animation.fromSpritesheet(images.wpnman_nakedwalkleft, 9, 13, true); 
+        this.nakedwalkright = Animation.fromSpritesheet(images.wpnman_nakedwalkright, 9, 13, true);
+        console.log("nakedpunchleft");
+        this.nakedpunchleft = Animation.fromSpritesheet(images.wpnman_nakedpunchleft, 9, 13, true);
+        console.log("nakedpunchright");
+        this.nakedpunchright = Animation.fromSpritesheet(images.wpnman_nakedpunchright, 9, 13, true);
+        this.nakedidlesprite = new PIXI.Sprite(images.wpnman_nakedidle);
+
         this.punchleft.frame_delayms = 80;
         this.punchright.frame_delayms = 80;
 
-        this.walkleft.play(this.game);
-        this.walkright.play(this.game);
-        this.sprite = this.idlesprite;
+        this.nakedpunchleft.frame_delayms = 80;
+        this.nakedpunchright.frame_delayms = 80;
+
+        this.nakedwalkleft.play(this.game);
+        this.nakedwalkright.play(this.game);
+
+        this.spritemap = {
+            walkleft: this.nakedwalkleft,
+            walkright: this.nakedwalkright,
+            punchleft: this.nakedpunchleft,
+            punchright: this.nakedpunchright,
+            idlesprite: this.nakedidlesprite
+        };
+
+        console.log("arahgrahrhag");
+
+        this.sprite = this.spritemap.idlesprite;
         this.spritecontainer = new PIXI.Container();
         this.spritecontainer.pivot = new PIXI.Point
             (this.sprite.width / 2, this.sprite.height / 2);
@@ -34,7 +56,8 @@ define(["matter.min", "app/animation"], function (Matter, Animation) {
         this.spritebody = Matter.Bodies.rectangle
             (10, 0, this.sprite.width-2, this.sprite.height,
              { sleepThreshold: 10, density: 1000, inertia: Infinity, 
-               inverseInertia: 0, friction: 0.5 });
+               inverseInertia: 0, friction: 0.5,
+               collisionFilter: { category: 2 } });
 
         Matter.World.add(this.matterworld, [ this.spritebody ]);
 
@@ -54,8 +77,8 @@ define(["matter.min", "app/animation"], function (Matter, Animation) {
         this.spritecontainer.addChild(this.sprite);
     };
 
-    Player.prototype.addPunchable = function (rect, callback) {
-        if (rect) this.punchables.push([rect, callback]);
+    Player.prototype.addPunchable = function (region, callback) {
+        if (region) this.punchables.push([region, callback]);
     };
 
     Player.prototype.getPunchable = function (pos) {
@@ -95,6 +118,7 @@ define(["matter.min", "app/animation"], function (Matter, Animation) {
             threshold: 5,
             punching: false,
             player: player,
+            punchTarget: null,
             update: function (delta, time) {
                 var p = this.player;
                 //Matter.Body.setAngle(player.spritebody, 0);
@@ -107,36 +131,37 @@ define(["matter.min", "app/animation"], function (Matter, Animation) {
                         if (p.targetPunchable != null) {
                             Matter.Body.setVelocity(p.spritebody, V.create(0, p.spritebody.velocity.y));
                             this.punching = true;
+                            this.punchTarget = p.targetPunchable;
                             if (this.dir > 0) {
-                                p.changeSprite(p.punchright.sprite);
-                                p.punchright.play
+                                p.changeSprite(p.spritemap.punchright.sprite);
+                                p.spritemap.punchright.play
                                     (p.game, false, undefined, (function () {
-                                        p.punch(p.targetPunchable);
-                                        p.changeSprite(p.idlesprite);
+                                        p.punch(this.punchTarget);
+                                        p.changeSprite(p.spritemap.idlesprite);
                                         this.punching = false;
                                     }).bind(this));
                             } else if (this.dir < 0) {
-                                p.changeSprite(p.punchleft.sprite);
-                                p.punchleft.play
+                                p.changeSprite(p.spritemap.punchleft.sprite);
+                                p.spritemap.punchleft.play
                                     (p.game, false, undefined, (function () {
-                                        p.punch(p.targetPunchable);
-                                        p.changeSprite(p.idlesprite);
+                                        p.punch(this.punchTarget);
+                                        p.changeSprite(p.spritemap.idlesprite);
                                         this.punching = false;
                                     }).bind(this));
                             }
                         } else {
-                            p.changeSprite(p.idlesprite);
+                            p.changeSprite(p.spritemap.idlesprite);
                         }
                     } else {
                         this.dir = dist > 0 ? 1 : -1;
                         Matter.Body.setVelocity(p.spritebody,
                             V.create(this.dir*this.speed, p.spritebody.velocity.y));
                         if (this.dir == 1 && p.sprite != p.walkright.sprite) {
-                            p.changeSprite(p.walkright.sprite);
+                            p.changeSprite(p.spritemap.walkright.sprite);
                             p.walkleft.pause();
                             p.walkright.resume();
-                        } else if (this.dir == -1 && p.sprite != p.walkleft.sprite) {
-                            p.changeSprite(p.walkleft.sprite);
+                        } else if (this.dir == -1 && p.sprite != p.spritemap.walkleft.sprite) {
+                            p.changeSprite(p.spritemap.walkleft.sprite);
                             p.walkright.pause();
                             p.walkleft.resume();
                         }
@@ -158,6 +183,8 @@ define(["matter.min", "app/animation"], function (Matter, Animation) {
             var p = this.getPunchable(target);
             if (p != -1) {
                 this.targetPunchable = p;
+            } else {
+                this.targetPunchable = null;
             }
         }
     };
