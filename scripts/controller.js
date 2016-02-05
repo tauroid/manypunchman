@@ -47,15 +47,12 @@ define(function () {
     };
 
     Controller.prototype.processMousemove = function (message) {
-        console.log("mousemove");
     };
 
     Controller.prototype.processKeydown = function (message) {
-        console.log("keydown");
     };
 
     Controller.prototype.processKeyup = function (message) {
-        console.log("keyup");
     };
 
     return Controller;

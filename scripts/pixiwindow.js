@@ -1,4 +1,4 @@
-define(["pixi.min"], function (PIXI) {
+define(["common/pixi.min"], function (PIXI) {
     PIXIWindow = function (width, height, stage, renderer) {
         if (!width && !height) {
             width = window.innerWidth;

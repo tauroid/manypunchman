@@ -1,4 +1,4 @@
-define(['three.min'], function(THREE) {
+define(['common/three.min'], function(THREE) {
     THREEWindow = function (width, height, scene, camera) {
         this.scene = scene;
         this.camera = camera;

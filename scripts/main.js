@@ -1,7 +1,8 @@
 requirejs.config({
-    baseUrl: "/scripts/common",
+    baseUrl: "scripts",
     paths: {
-        app: "/games/manypunchman/scripts",
+        common: "/scripts/common",
+        jquery: "/scripts/common/jquery"
     },
     shim: {
         "sylvester": {
@@ -11,7 +12,7 @@ requirejs.config({
             exports: "THREE"
         }
     },
-    //urlArgs: "bust=" + (new Date()).getTime(),
+    urlArgs: "bust=" + (new Date()).getTime(),
     waitSeconds: 0
 });
 
@@ -22,6 +23,6 @@ function start(Game, Config) {
     game.ready(function () { game.load(config); });
 }
 
-require(['jquery','app/game','app/manypunchman'], function ($, Game, Config) {
+require(['jquery','game','manypunchman'], function ($, Game, Config) {
     $(document).ready(function () { start(Game, Config); });
 });

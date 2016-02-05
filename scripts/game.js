@@ -2,7 +2,7 @@
 //  - Update logic groups
 //  - Render game windows
 
-define(['app/assets','app/messagebus','app/movements'],
+define(['assets','messagebus','movements'],
         function (Assets, MessageBus, Movements) {
     Game = function () {
         this.data = {};
@@ -36,7 +36,6 @@ define(['app/assets','app/messagebus','app/movements'],
 
         this.focussed = true;
         window.onfocus = (function (ev) {
-            console.log("focus");
             this.focussed = true;
             this.lastUpdateTime = (new Date()).getTime();
         }).bind(this);

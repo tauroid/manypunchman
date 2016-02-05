@@ -6,7 +6,7 @@ define(function () {
         this._m = this.game.logicgroups.movements;
     }
 
-    Movements.prototype.move = function (obj, x1, y1, x2, y2, duration, interp, fn) {
+    Movements.prototype.move = function (movefn, x1, y1, x2, y2, duration, interp, fn) {
         if (!interp) interp = "linear";
         if (typeof(interp) == "string") {
            if (interp == "linear") {
@@ -25,15 +25,14 @@ define(function () {
             startTime: new Date().getTime(),
             update: function (delta, time) {
                 if (time - this.startTime > duration) {
-                    obj.x = x2; obj.y = y2;
+                    movefn(x2, y2);
                     this.finished = true;
                     if(fn) fn();
                     return;
                 }
 
                 var pos = interp(time - this.startTime);
-                obj.x = x1 + (x2-x1)*pos;
-                obj.y = y1 + (y2-y1)*pos;
+                movefn(x1 + (x2-x1)*pos, y1 + (y2-y1)*pos);
             }
         });
     };

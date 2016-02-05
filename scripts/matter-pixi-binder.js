@@ -1,6 +1,6 @@
 // Body to PIXI thing with position & angle
 
-define(["matter.min", "app/statebinder"], function (Matter, StateBinder) {
+define(["common/matter.min", "statebinder"], function (Matter, StateBinder) {
     MatterPIXIBinder = function (scaling1to2) {
         StateBinder.call(this, scaling1to2);
     };

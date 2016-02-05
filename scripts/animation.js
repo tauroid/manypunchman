@@ -1,4 +1,4 @@
-define(["pixi.min"], function (PIXI) {
+define(["common/pixi.min"], function (PIXI) {
     Animation = function () {
         this.frames = [];
         this.sprite = undefined;
@@ -27,10 +27,8 @@ define(["pixi.min"], function (PIXI) {
 
         var sf = sheetframe;
 
-        console.log("Sheet width: "+sf.width+", Sheet height: "+sf.height);
         var nx = Math.floor(sf.width / texwidth);
         var ny = Math.floor(sf.height / texheight);
-        console.log("nx: "+nx+" ny: "+ny);
 
         var n1, n2;
         if (rowMajor) {
